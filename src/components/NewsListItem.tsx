@@ -42,11 +42,9 @@ export default function Article({ item }) {
         />
 
         <View style={{ flex: 1 }}>
-          <TouchableOpacity onPress={openLink}>
-            <Text style={styles.articleTitle} numberOfLines={2}>
-              {item.title}
-            </Text>
-          </TouchableOpacity>
+          <Text style={styles.articleTitle} numberOfLines={2}>
+            {item.title}
+          </Text>
 
           <Text style={styles.articlePublishedAt}>
             {date} | {time}
@@ -67,6 +65,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,
+    flexDirection: "row",
   },
   articleImage: {
     width: 150,

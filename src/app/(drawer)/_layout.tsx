@@ -28,11 +28,11 @@ const CustomDrawerContent = (props: any) => {
 
   const { authState, onLogout } = useAuth();
   // console.log(authState);
-  if (!authState?.authenticated) {
-    router.push("/");
-  }
 
   useEffect(() => {
+    if (!authState?.authenticated) {
+      router.push("/");
+    }
     const loadUser = async () => {
       try {
         const result = await axios.get(`${API_URL}/user/auth`);

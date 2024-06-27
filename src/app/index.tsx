@@ -10,7 +10,7 @@ import {
 import { useEffect, useState } from "react";
 import Button from "@/components/Button";
 import Colors from "@/constants/Colors";
-import { Link, useRouter } from "expo-router";
+import { Link, Redirect, useRouter } from "expo-router";
 import { API_URL, useAuth } from "@/providers/AuthProvider";
 import axios from "axios";
 
@@ -18,6 +18,7 @@ const image = {
   uri: "@assets/images/Backgroundimage.png",
 };
 const index = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [text, onChangeText] = useState("");
   const [password, onChangePassword] = useState("");
   const [errors, setErrors] = useState("");
@@ -26,9 +27,16 @@ const index = () => {
 
   const { onLogin, authState } = useAuth();
 
-  if (authState?.authenticated) {
+  useEffect(() => {
+    if (authState?.authenticated) {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  if (isLoggedIn) {
     router.push("/home");
   }
+
   const validateInputs = () => {
     setErrors("");
     if (!text) {

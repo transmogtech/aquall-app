@@ -55,6 +55,18 @@ export async function getUsers(userRole = "") {
   }
 }
 
+export async function getTechnicians() {
+  try {
+    const response = await axios.get(
+      `${API_URL}/user?userroleId=6658f0a00db84a26d0d23198`
+    );
+
+    return response.data.users;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 export async function getSponsoredAds(limit = 3) {
   try {
     const response = await axios.get(`${API_URL}/sponsored-ads`);

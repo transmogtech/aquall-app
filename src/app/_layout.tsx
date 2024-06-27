@@ -5,20 +5,16 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Link, Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import "react-native-reanimated";
 
 import CartProvider from "@/providers/CartProvider";
 import { AuthProvider, useAuth } from "@/providers/AuthProvider";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import home from "./(drawer)/(tabs)/home";
-import Login from "./(auth)/login";
-export {
-  // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
-} from "expo-router";
+import Colors from "@/constants/Colors";
+import { Pressable } from "react-native";
+import MenuButton from "@/components/MenuButton";
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -62,16 +58,13 @@ function RootLayoutNav() {
         <CartProvider>
           <Stack>
             <Stack.Screen name="index" options={{ headerShown: false }} />
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
             <Stack.Screen
               name="(user)/orders"
               options={{ headerShown: false }}
             />
             <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
-            {/* <Stack.Screen
-              name="cart"
-              options={{ presentation: "transparentModal" }}
-            /> */}
+
+            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
           </Stack>
         </CartProvider>
       </AuthProvider>

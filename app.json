@@ -14,20 +14,14 @@
     },
     "ios": {
       "supportsTablet": true,
-      "config": {
-        "useNonExemptEncryption": false
-      }
+      "config": {}
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.AquallApp"
-    },
-    "androidStatusBar": {
-      "backgroundColor": "#C2185B",
-      "translucent": false
+      "package": "com.sangitatech.AquallApp"
     },
     "web": {
       "bundler": "metro",
@@ -35,6 +29,14 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ],
       "expo-router",
       "expo-video",
       "expo-document-picker",
