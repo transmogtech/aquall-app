@@ -33,15 +33,14 @@ export default function Article({ item }) {
   const time = format(new Date(item.created), "HH:mm:ss");
 
   return (
-    <Link href={`/news/${item._id}`} asChild>
+    <Link href={`/news/${item._id}`} key={item._id} asChild>
       <Pressable style={styles.article}>
-        {/* Caching image for better performance: https://github.com/DylanVann/react-native-fast-image */}
         <Image
           source={{ uri: `${API_URL}/${item.imageUrl}` }}
           style={styles.articleImage}
         />
 
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, justifyContent: "center" }}>
           <Text style={styles.articleTitle} numberOfLines={2}>
             {item.title}
           </Text>
@@ -57,21 +56,21 @@ export default function Article({ item }) {
 
 const styles = StyleSheet.create({
   article: {
+    backgroundColor: "white",
     padding: 10,
-    width: "100%",
-    backgroundColor: Colors.light.background,
+    marginHorizontal: 10,
+    elevation: 2,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.8,
-    shadowRadius: 2,
-    elevation: 5,
+    borderRadius: 10,
     flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   articleImage: {
-    width: 150,
-    height: 85,
+    width: 100,
+    height: 100,
     resizeMode: "cover",
-    marginRight: 10,
+    marginRight: 20,
   },
   articleTitle: {
     fontSize: 18,
@@ -84,6 +83,5 @@ const styles = StyleSheet.create({
   },
   articlePublishedAt: {
     fontSize: 14,
-    textAlign: "center",
   },
 });

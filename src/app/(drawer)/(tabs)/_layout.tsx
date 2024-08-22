@@ -1,29 +1,48 @@
 import React from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Link, Tabs } from "expo-router";
-import { Pressable } from "react-native";
+import { Pressable, View, Text, Image } from "react-native";
 
 import Colors from "@constants/Colors";
 import { useColorScheme } from "@components/useColorScheme";
 import { useClientOnlyValue } from "@components/useClientOnlyValue";
 import Entypo from "@expo/vector-icons/Entypo";
 import { DrawerToggleButton } from "@react-navigation/drawer";
+import { useCart } from "@/providers/CartProvider";
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>["name"];
   color: string;
 }) {
-  return <FontAwesome size={20} style={{ marginBottom: 2 }} {...props} />;
+  return <FontAwesome size={24} style={{ marginBottom: 2 }} {...props} />;
 }
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
+  const { items } = useCart();
+  // console.log("Cart size: " + items.length);
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors.light.tint,
+        tabBarActiveTintColor: Colors.light.blueColor,
+        tabBarLabelStyle: {
+          fontSize: 14,
+          paddingVertical: 10,
+          fontFamily: "Quicksand_600SemiBold",
+        },
+        tabBarStyle: {
+          height: 90,
+          shadowOffset: {
+            width: 0,
+            height: 12,
+          },
+          shadowOpacity: 0.58,
+          shadowRadius: 16.0,
+          elevation: 24,
+        },
+        tabBarIconStyle: { marginTop: 10 },
         // Disable the static render of the header on web
         // to prevent a hydration error in React Navigation v6.
         headerShown: useClientOnlyValue(false, true),
@@ -34,12 +53,26 @@ export default function TabLayout() {
           <Link href="/cart" asChild>
             <Pressable>
               {({ pressed }) => (
-                <FontAwesome
-                  name="shopping-cart"
-                  size={25}
-                  color={Colors.light.background}
-                  style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                />
+                <View>
+                  <Image
+                    source={require("@assets/images/cart.png")}
+                    style={{ width: 24, height: 24, marginRight: 10 }}
+                  />
+
+                  <Text
+                    style={{
+                      color: "white",
+                      position: "absolute",
+                      top: -5,
+                      right: 22,
+                      zIndex: 999,
+                      fontSize: 12,
+                      fontFamily: "Quicksand_500Medium",
+                    }}
+                  >
+                    {items.length > 0 && items.length}
+                  </Text>
+                </View>
               )}
             </Pressable>
           </Link>
@@ -51,15 +84,12 @@ export default function TabLayout() {
         headerTitleStyle: {
           fontSize: 16,
           color: Colors.light.background,
+          fontFamily: "Quicksand_600SemiBold",
         },
 
         headerTitleAlign: "center",
       }}
     >
-      <Tabs.Screen
-        name="index"
-        options={{ href: null, headerTitle: "Products" }}
-      />
       <Tabs.Screen name="home" options={{ href: null, headerTitle: "Home" }} />
 
       <Tabs.Screen
@@ -85,7 +115,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="news"
         options={{
-          title: "News",
+          title: "Aqua News",
           headerShown: false,
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="newspaper-o" color={color} />
@@ -95,21 +125,46 @@ export default function TabLayout() {
       <Tabs.Screen
         name="products"
         options={{
-          headerTitle: "Products",
+          title: "Shop",
           headerShown: false,
           tabBarIcon: ({ color }) => (
-            <Entypo name="shop" size={28} color={Colors.light.blueColor} />
+            <Entypo name="shop" size={40} color={color} />
           ),
+          tabBarIconStyle: {
+            shadowOffset: {
+              width: 0,
+              height: 12,
+            },
+            shadowOpacity: 0.58,
+            shadowRadius: 16.0,
+            elevation: 24,
+            borderTopLeftRadius: 21,
+            borderTopRightRadius: 21,
+          },
           headerRight: () => (
             <Link href="/modal" asChild>
               <Pressable>
                 {({ pressed }) => (
-                  <FontAwesome
-                    name="info-circle"
-                    size={25}
-                    color={Colors[colorScheme ?? "light"].background}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
+                  <View>
+                    <Image
+                      source={require("@assets/images/cart.png")}
+                      style={{ width: 24, height: 24, marginRight: 10 }}
+                    />
+
+                    <Text
+                      style={{
+                        color: "white",
+                        position: "absolute",
+                        top: -5,
+                        right: 22,
+                        zIndex: 999,
+                        fontSize: 12,
+                        fontFamily: "Quicksand_500Medium",
+                      }}
+                    >
+                      {items.length > 0 && items.length}
+                    </Text>
+                  </View>
                 )}
               </Pressable>
             </Link>
@@ -119,7 +174,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="jobs"
         options={{
-          title: "Jobs",
+          title: "Classified",
           headerShown: false,
           tabBarIcon: ({ color }) => (
             <TabBarIcon name="briefcase" color={color} />

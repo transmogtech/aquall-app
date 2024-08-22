@@ -7,10 +7,11 @@ import {
   Text,
   FlatList,
   Pressable,
-  TouchableOpacity,
+  ImageBackground,
+  RefreshControl,
 } from "react-native";
 import { useEffect, useState } from "react";
-import { Stack, Link } from "expo-router";
+import { Stack, Link, router } from "expo-router";
 import ImageSlider from "@/components/ImageSlider";
 import { FontAwesome } from "@expo/vector-icons";
 import Button from "@/components/Button";
@@ -31,8 +32,11 @@ import { getNews } from "@assets/data/news";
 import VideoListItem from "@/components/VideoListItem";
 import { API_URL } from "@/providers/AuthProvider";
 import React from "react";
-
+import moment from "moment";
+import { useSelector } from "react-redux";
+import { CapitalizeFirstLetter } from "@/functions";
 const home = () => {
+  const { user, isLoading } = useSelector((state) => state.auth);
   const [categories, setCategories] = useState([]);
   const [sliderImages, setSliderImages] = useState([]);
   const [seedProducts, setSeedProducts] = useState([]);
@@ -45,11 +49,18 @@ const home = () => {
   const [videos, setVideos] = useState([]);
   const [technicians, setTechnicians] = useState([]);
   const [sponsoredAds, setSponsoredAds] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const categoryArr = {
+    seed: "664645fb3f25f68d99341a74",
+    feed: "664645eb3f25f68d99341a71",
+    chemicals: "6646460f3f25f68d99341a77",
+    aerators: "6646461c3f25f68d99341a7a",
+    others: "66b284ff761baa9ebd06a011",
+  };
 
-  useEffect(() => {
+  const fetchData = async () => {
     const fetchCategories = async () => {
       const result = await getCagegories();
-
       setCategories(result);
     };
 
@@ -60,44 +71,43 @@ const home = () => {
     };
 
     const getSeedProducts = async () => {
-      const result = await getProducts("664645fb3f25f68d99341a74");
+      const result = await getProducts(categoryArr["seed"]);
 
       setSeedProducts(result);
     };
 
     const getFeedProducts = async () => {
-      const result = await getProducts("664645eb3f25f68d99341a71");
+      const result = await getProducts(categoryArr["feed"]);
 
       setFeedProducts(result);
     };
 
     const getAeratorsProducts = async () => {
-      const result = await getProducts("6646461c3f25f68d99341a7a");
+      const result = await getProducts(categoryArr["aerators"]);
 
       setAeratorsProducts(result);
     };
 
     const getChemicalProducts = async () => {
-      const result = await getProducts("6646460f3f25f68d99341a77");
+      const result = await getProducts(categoryArr["chemicals"]);
 
       setChemicalProducts(result);
     };
 
     const getOtherProducts = async () => {
-      const result = await getProducts("6646463e3f25f68d99341a80");
+      const result = await getProducts(categoryArr["others"]);
 
       setOtherProducts(result);
     };
 
     const getBestSellingProducts = async () => {
-      const result = await getProducts();
+      const result = await getProducts("", 4);
 
-      setOtherProducts(result);
+      setBestSellingProducts(result);
     };
 
     const getNewsList = async () => {
       const result = await getNews(1, 2);
-
       setNews(result);
     };
 
@@ -115,9 +125,9 @@ const home = () => {
 
     const fetchSponsoredAds = async () => {
       const result = await getSponsoredAds(3);
-      console.log("sponsored Ad: ");
+      // // console.log("sponsored Ad: ");
 
-      console.log(result);
+      // // console.log(result);
       setSponsoredAds(result);
     };
 
@@ -133,7 +143,20 @@ const home = () => {
     fetchCategories();
     fetchAppSliderImages();
     fetchSponsoredAds();
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchData();
+    setRefreshing(false);
+  };
+
+  useEffect(() => {
+    fetchData();
   }, []);
+
+  // // console.log(news);
+
   const categoryIcons = {
     testkit: require("@assets/images/test_kit.png"),
     seed: require("@assets/images/Seeds.png"),
@@ -144,160 +167,224 @@ const home = () => {
   };
 
   return (
-    <View className="flex-1 justify-center p-0 m-0 font-[Satoshi]">
+    <View className="flex-1 justify-center p-0 m-0">
       <Stack.Screen
         options={{
-          title: "Aquall",
+          headerTitle: "Aquall",
           headerShown: true,
           headerTitleAlign: "center",
         }}
       />
       <SafeAreaView className="flex-1">
-        <ScrollView className="flex-1">
-          <View className="flex-1 flex-row justify-between items-center p-5">
-            {categories &&
-              categories.map((category) => {
-                return (
+        <ScrollView
+          className="flex-1"
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          <ImageBackground
+            source={require("@assets/images/Backgroundimage.png")}
+            resizeMode="stretch"
+            className="justify-center flex-1 w-full"
+          >
+            <ScrollView
+              showsHorizontalScrollIndicator={false}
+              horizontal={true}
+              style={styles.categoryContainer}
+            >
+              <FlatList
+                data={categories}
+                renderItem={({ item, index }) => (
                   <Link
                     href={{
                       pathname: "/products",
-                      params: { category: category._id },
+                      params: { category: item._id },
                     }}
-                    key={Math.random()}
+                    key={index}
                     asChild
                   >
-                    <Pressable>
-                      <Image source={categoryIcons[category.url]} />
-                      <Text>{category.title}</Text>
+                    <Pressable style={styles.categoryCard}>
+                      <Image
+                        source={categoryIcons[item.url]}
+                        style={{
+                          alignSelf: "center",
+                          width: 50,
+                          height: 50,
+                        }}
+                      />
+                      <Text
+                        style={{
+                          textAlign: "center",
+                          paddingTop: 10,
+                          fontFamily: "Quicksand_600SemiBold",
+                          color: Colors.light.text,
+                          fontSize: 14,
+                        }}
+                      >
+                        {item.title}
+                      </Text>
                     </Pressable>
                   </Link>
-                );
-              })}
-          </View>
-          {sliderImages && <ImageSlider images={sliderImages} />}
-          {seedProducts && (
-            <ProductList products={seedProducts} title="Top Selling Seeds" />
-          )}
-          {feedProducts && (
-            <ProductList products={feedProducts} title="Top Selling Feeds" />
-          )}
-
-          <BestSellingProductList
-            products={bestSellingProducts}
-            title="Best Selling Products"
-          />
-          {sponsoredAds && <SponsoredAd ad={sponsoredAds[0]} />}
-          {sponsoredAds && <SponsoredAd ad={sponsoredAds[1]} />}
-          {chemicalProducts && (
-            <ProductList
-              products={chemicalProducts}
-              title="Top Selling Chemicals"
-            />
-          )}
-          {aeratorsProducts && (
-            <ProductList
-              products={aeratorsProducts}
-              title="Top Selling Aerators"
-            />
-          )}
-          {otherProducts && (
-            <ProductList
-              products={otherProducts}
-              title="Top Selling Other Products"
-            />
-          )}
-          <View style={styles.container}>
-            <Text style={styles.title}>Latest News</Text>
-            <FontAwesome name="angle-right" size={20} />
-          </View>
-          <FlatList
-            data={news}
-            renderItem={({ item, index }) => (
-              <Link href={`/news/${item._id}`} asChild>
-                <Pressable style={styles.article}>
-                  <Image
-                    source={{ uri: `${API_URL}/${item.imageUrl}` }}
-                    style={styles.articleImage}
-                  />
-
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.articleTitle} numberOfLines={2}>
-                      {item.title}
-                    </Text>
-
-                    <Text style={styles.articlePublishedAt}>
-                      {item.created}
-                    </Text>
-                  </View>
-                </Pressable>
-              </Link>
+                )}
+                horizontal={true}
+                onEndReachedThreshold={1}
+                style={{ paddingVertical: 10 }}
+                scrollEnabled={false}
+              />
+            </ScrollView>
+            {sliderImages && <ImageSlider images={sliderImages} />}
+            {seedProducts && (
+              <ProductList
+                products={seedProducts}
+                title="Top Selling Seeds"
+                id={categoryArr["seed"]}
+              />
             )}
-            showsVerticalScrollIndicator={false}
-            initialNumToRender={6}
-            onEndReachedThreshold={1}
-            contentContainerStyle={{ gap: 20 }}
-            style={{ paddingVertical: 10 }}
-            scrollEnabled={false}
-          />
-          {sponsoredAds && <SponsoredAd ad={sponsoredAds[2]} />}
-          <View style={styles.container}>
-            <Text style={styles.title}>Latest Videos</Text>
-            <FontAwesome name="angle-right" size={20} />
-          </View>
-
-          <FlatList
-            data={videos}
-            renderItem={({ item, index }) => <VideoListItem video={item} />}
-            showsVerticalScrollIndicator={false}
-            initialNumToRender={6}
-            onEndReachedThreshold={1}
-            contentContainerStyle={{ gap: 20 }}
-            style={{ paddingVertical: 10 }}
-            scrollEnabled={false}
-          />
-
-          <View style={styles.container}>
-            <Text style={styles.title}>Contact Technicians</Text>
-            <FontAwesome name="angle-right" size={20} />
-          </View>
-          <FlatList
-            data={technicians}
-            renderItem={({ item, index }) => (
-              <Link href={`/news/${item.id}`} asChild>
-                <Pressable style={styles.article}>
-                  {/* Caching image for better performance: https://github.com/DylanVann/react-native-fast-image */}
-                  <Image
-                    source={{
-                      uri: `${API_URL}/${item.avatar}` || defaultUserImage,
-                    }}
-                    style={styles.userImage}
-                  />
-
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.userName} numberOfLines={2}>
-                      {item.name}
-                    </Text>
-
-                    {/* <Text style={styles.location}>{item.location}</Text> */}
-
-                    <Text style={styles.mobile}>
-                      <FontAwesome name="mobile" size={20} /> {item.mobile}
-                    </Text>
-
-                    <Text style={styles.email}>
-                      <FontAwesome name="envelope" size={20} /> {item.email}
-                    </Text>
-                  </View>
-                </Pressable>
-              </Link>
+            {feedProducts && (
+              <ProductList
+                products={feedProducts}
+                title="Top Selling Feeds"
+                id={categoryArr["feed"]}
+              />
             )}
-            showsVerticalScrollIndicator={false}
-            initialNumToRender={6}
-            onEndReachedThreshold={1}
-            contentContainerStyle={{ gap: 20 }}
-            style={{ paddingVertical: 10 }}
-            scrollEnabled={false}
-          />
+
+            <BestSellingProductList
+              products={bestSellingProducts}
+              title="Best Selling Products"
+            />
+            {/* {sponsoredAds && <SponsoredAd ad={sponsoredAds[0]} />} */}
+            {/* {sponsoredAds && <SponsoredAd ad={sponsoredAds[1]} />} */}
+            {chemicalProducts && (
+              <ProductList
+                products={chemicalProducts}
+                title="Top Selling Chemicals"
+                id={categoryArr["chemicals"]}
+              />
+            )}
+            {aeratorsProducts && (
+              <ProductList
+                products={aeratorsProducts}
+                title="Top Selling Aerators"
+                id={categoryArr["aerators"]}
+              />
+            )}
+            <Link href={`/news`} key={Math.random()} asChild>
+              <Pressable>
+                <View style={styles.container}>
+                  <Text style={styles.title}>Latest News</Text>
+                  <FontAwesome name="angle-right" size={20} />
+                </View>
+              </Pressable>
+            </Link>
+            <FlatList
+              data={news}
+              renderItem={({ item, index }) => (
+                <Link href={`/news/${item._id}`} asChild>
+                  <Pressable style={styles.article} key={index}>
+                    <Image
+                      source={{ uri: `${API_URL}/${item.imageUrl}` }}
+                      style={styles.articleImage}
+                    />
+
+                    <View
+                      style={{
+                        flex: 1,
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Text style={styles.articleTitle} numberOfLines={2}>
+                        {CapitalizeFirstLetter(item.title)}
+                      </Text>
+
+                      <Text style={styles.articlePublishedAt}>
+                        {moment(item.created).format("DD-MM-YYYY")} |{" "}
+                        {moment(item.created).format("HH:mm:ss")}{" "}
+                      </Text>
+                    </View>
+                  </Pressable>
+                </Link>
+              )}
+              showsVerticalScrollIndicator={false}
+              initialNumToRender={2}
+              onEndReachedThreshold={1}
+              contentContainerStyle={{ gap: 20 }}
+              style={{ paddingVertical: 10 }}
+              scrollEnabled={false}
+            />
+            <Image
+              source={require("@assets/images/banner.png")}
+              resizeMode="contain"
+              style={{ width: "100%", height: 200 }}
+            />
+
+            {/* {sponsoredAds && <SponsoredAd ad={sponsoredAds[2]} />} */}
+            <Link href={`/videos`} key={Math.random()} asChild>
+              <Pressable>
+                <View style={styles.container}>
+                  <Text style={styles.title}>Latest Videos</Text>
+                  <FontAwesome name="angle-right" size={20} />
+                </View>
+              </Pressable>
+            </Link>
+            <FlatList
+              data={videos}
+              renderItem={({ item, index }) => <VideoListItem video={item} />}
+              showsVerticalScrollIndicator={false}
+              initialNumToRender={6}
+              onEndReachedThreshold={1}
+              contentContainerStyle={{ gap: 20 }}
+              style={{ paddingVertical: 10 }}
+              scrollEnabled={false}
+            />
+
+            <Link href={`/technician`} key={Math.random()} asChild>
+              <Pressable>
+                <View style={styles.container}>
+                  <Text style={styles.title}>Contact Technicians</Text>
+                  <FontAwesome name="angle-right" size={20} />
+                </View>
+              </Pressable>
+            </Link>
+            <FlatList
+              data={technicians}
+              renderItem={({ item, index }) => (
+                <Link href={`/news/${item.id}`} asChild>
+                  <Pressable style={styles.article} key={index}>
+                    <Image
+                      source={{
+                        uri: defaultUserImage,
+                      }}
+                      style={styles.userImage}
+                    />
+
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.userName} numberOfLines={2}>
+                        {CapitalizeFirstLetter(item.name)}
+                      </Text>
+
+                      {/* <Text style={styles.location}>{item.location}</Text> */}
+
+                      <Text style={styles.mobile}>
+                        <FontAwesome name="mobile" size={20} />{" "}
+                        {CapitalizeFirstLetter(item.mobile)}
+                      </Text>
+
+                      <Text style={styles.email}>
+                        <FontAwesome name="envelope" size={20} />{" "}
+                        {CapitalizeFirstLetter(item.email)}
+                      </Text>
+                    </View>
+                  </Pressable>
+                </Link>
+              )}
+              showsVerticalScrollIndicator={false}
+              initialNumToRender={6}
+              onEndReachedThreshold={1}
+              contentContainerStyle={{ gap: 20 }}
+              style={{ paddingVertical: 10 }}
+              scrollEnabled={false}
+            />
+          </ImageBackground>
         </ScrollView>
       </SafeAreaView>
     </View>
@@ -317,6 +404,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     padding: 20,
+    fontFamily: "Quicksand_400Regular",
   },
   container2: {
     flex: 1,
@@ -325,15 +413,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     padding: 20,
+    fontFamily: "Quicksand_400Regular",
   },
   title: {
+    fontFamily: "Quicksand_700Bold",
     fontSize: 20,
-    fontWeight: "bold",
   },
   article: {
     flexDirection: "row",
+
     padding: 10,
-    backgroundColor: Colors.light.background,
+    // backgroundColor: Colors.light.background,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.8,
@@ -342,7 +432,7 @@ const styles = StyleSheet.create({
   },
   articleImage: {
     width: 150,
-    height: 85,
+    height: 150,
     resizeMode: "cover",
     marginRight: 20,
   },
@@ -351,10 +441,12 @@ const styles = StyleSheet.create({
     height: 85,
     resizeMode: "cover",
     marginRight: 20,
+    borderRadius: 50,
   },
   articleTitle: {
+    fontFamily: "Quicksand_600SemiBold",
+
     fontSize: 18,
-    fontWeight: "bold",
     marginBottom: 10,
   },
   articleDescription: {
@@ -362,8 +454,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   articlePublishedAt: {
+    fontFamily: "Quicksand_500Medium",
     fontSize: 14,
-    textAlign: "center",
+    color: "#5A5A5A",
   },
   date: {
     fontSize: 14,
@@ -371,20 +464,33 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   video: {
-    alignSelf: "center",
     width: "100%",
     height: 200,
   },
   userName: {
     color: Colors.light.blueColor,
+    fontFamily: "Quicksand_600SemiBold",
+    fontSize: 16,
   },
   location: {
     color: "#767E7E",
   },
   mobile: {
     color: "#1E1E1E",
+    fontFamily: "Quicksand_500Medium",
+    padding: 10,
   },
   email: {
+    fontFamily: "Quicksand_500Medium",
     color: "#787878",
+  },
+  categoryContainer: { padding: 8 },
+  categoryCard: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    width: 75,
+    margin: 10,
+    // elevation: 4,
   },
 });

@@ -7,7 +7,7 @@ import {
 } from "react-native";
 // import jobs from "@assets/data/jobs";
 import JobListItem from "@/components/JobListItem";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { API_URL } from "@/providers/AuthProvider";
 import axios from "axios";
 export default function TabOneScreen() {
@@ -20,7 +20,7 @@ export default function TabOneScreen() {
 
         setJobs(response.data.jobs);
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       }
     };
     fetchData();

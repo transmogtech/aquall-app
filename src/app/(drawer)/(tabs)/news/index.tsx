@@ -7,10 +7,12 @@ import {
   FlatList,
   ActivityIndicator,
   ImageBackground,
+  ScrollView,
+  TouchableOpacity,
 } from "react-native";
 import Constants from "expo-constants";
 import { uniqBy } from "lodash";
-import { getNews } from "@assets/data/news";
+import { getNews, getLanguages } from "@assets/data/news";
 import NewsItemListItem from "@/components/NewsListItem";
 import {
   SegmentedButtons,
@@ -36,39 +38,39 @@ export default function WorldwideNews() {
   const [articles, setArticles] = useState([]);
   const [page, setPage] = useState(1);
   const [refreshing, setRefreshing] = useState(false);
-  const [value, setValue] = React.useState("English");
-  const languages = ["Telugu", "English"];
+  const [value, setValue] = useState("664097ec7986f95eac9e4b3e");
+  const [languages, setLanguages] = useState([]);
   const hasMoreData = useRef(true);
+  const [activeTab, setActiveTab] = useState(value || "");
+
+  const fetchData = async (language: string) => {
+    // if (!hasMoreData.current) return;
+    setLoading(true);
+    setRefreshing(true);
+    const newArticles = await getNews(page, 20, language);
+
+    if (newArticles.length < PAGE_SIZE) {
+      hasMoreData.current = false;
+    }
+    setArticles(newArticles);
+    setValue(language);
+    setActiveTab(language);
+    setLoading(false);
+    setRefreshing(false);
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!hasMoreData.current) return;
-
-      const newArticles = await getNews(page, PAGE_SIZE);
-      // console.log(newArticles);
-
-      if (newArticles.length < PAGE_SIZE) {
-        hasMoreData.current = false;
-      }
-      setArticles(newArticles);
-      // setArticles((articles) => {
-      //   // Combine and filter article has no image
-      //   const allArticles = articles.concat(
-      //     newArticles.filter((article) => article.urlToImage)
-      //   );
-
-      //   // Remove duplicate articles
-      //   // https://lodash.com/docs/4.17.15#uniqBy
-      //   return uniqBy(allArticles, "url");
-      // });
-      setLoading(false);
-      setRefreshing(false);
+    const fetchLanguages = async () => {
+      const response = await getLanguages();
+      setLanguages(response);
+      // // console.log("languages: ");
+      // // console.log(response);
     };
 
-    fetchData();
-
-    // console.log("Loading articles");
-    // console.log(articles);
+    fetchData(value);
+    fetchLanguages();
+    setLoading(false);
+    setRefreshing(false);
   }, [page]);
 
   const refreshData = () => {
@@ -85,73 +87,81 @@ export default function WorldwideNews() {
       {hasMoreData.current && <ActivityIndicator color={PRIMARY_COLOR} />}
     </View>
   );
-  const keyExtractor = (item) => item.url;
 
   return (
-    <PaperProvider theme={theme}>
-      <SafeAreaView style={styles.container}>
-        <ImageBackground
-          source={require("@assets/images/Backgroundimage.png")}
-          resizeMode="cover"
-          className="justify-center flex-1 w-full"
-          imageStyle={{ opacity: 0.2 }}
-        >
-          <View style={styles.content}>
-            {/* <SegmentedButtons
-            value={value}
-            onValueChange={setValue}
-            buttons={[
-              {
-                value: "telugu",
-                label: "Telugu",
-              },
-              {
-                value: "english",
-                label: "English",
-              },
-            ]}
-          /> */}
+    <SafeAreaView style={styles.container}>
+      <ImageBackground
+        source={require("@assets/images/Backgroundimage.png")}
+        resizeMode="cover"
+        className="justify-center flex-1 w-full"
+        imageStyle={{ opacity: 0.2 }}
+      >
+        <View style={styles.content}>
+          <ScrollView
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{
+              flex: 1,
+            }}
+            style={styles.tabsContainer}
+          >
+            {languages &&
+              languages.map((language: any) => {
+                return (
+                  <View
+                    key={language._id}
+                    style={[
+                      styles.tab,
+                      activeTab === language._id && styles.activeTab,
+                    ]}
+                  >
+                    <TouchableOpacity onPress={() => fetchData(language._id)}>
+                      <Text
+                        style={[
+                          styles.tabText,
+                          activeTab === language._id && styles.activeTabText,
+                        ]}
+                      >
+                        {language.title}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                );
+              })}
+          </ScrollView>
 
-            <SegmentedControl
-              options={languages}
-              selectedOption={value}
-              onOptionChange={setValue}
+          {isLoading ? (
+            <View style={styles.center}>
+              <ActivityIndicator size="large" color={PRIMARY_COLOR} />
+            </View>
+          ) : (
+            <FlatList
+              data={articles}
+              renderItem={renderArticle}
+              keyExtractor={(item, index) => {
+                return index.toString();
+              }}
+              showsVerticalScrollIndicator={false}
+              ItemSeparatorComponent={renderDivider}
+              ListFooterComponent={renderFooter}
+              initialNumToRender={6}
+              // onEndReached={() => setPage((page) => page + 1)}
+              onEndReachedThreshold={1}
+              onRefresh={refreshData}
+              refreshing={refreshing}
+              style={{ paddingVertical: 20 }}
             />
-
-            {isLoading ? (
-              <View style={styles.center}>
-                {/* https://reactnative.dev/docs/activityindicator */}
-                <ActivityIndicator size="large" color={PRIMARY_COLOR} />
-              </View>
-            ) : (
-              // Optimizing FlatList: https://reactnative.dev/docs/optimizing-flatlist-configuration
-
-              <FlatList
-                data={articles}
-                renderItem={renderArticle}
-                keyExtractor={keyExtractor}
-                showsVerticalScrollIndicator={false}
-                ItemSeparatorComponent={renderDivider}
-                ListFooterComponent={renderFooter}
-                initialNumToRender={6}
-                onEndReached={() => setPage((page) => page + 1)}
-                onEndReachedThreshold={1}
-                onRefresh={refreshData}
-                refreshing={refreshing}
-                style={{ paddingVertical: 20 }}
-              />
-            )}
-          </View>
-        </ImageBackground>
-      </SafeAreaView>
-    </PaperProvider>
+          )}
+        </View>
+      </ImageBackground>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.light.greyColor,
+    // backgroundColor: Colors.light.greyColor,
     // paddingTop: Constants.statusBarHeight,
   },
   content: {
@@ -173,5 +183,42 @@ const styles = StyleSheet.create({
     padding: 10,
     // borderBottomWidth: 1,
     // borderBottomColor: "#ed7669",
+  },
+  tabsContainer: {
+    padding: 8,
+  },
+  tab: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    width: 90,
+    height: 50,
+    margin: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    backgroundColor: Colors.light.background,
+    borderRadius: 50,
+    // shadowColor: "#000",
+    // shadowOffset: { width: 1, height: 1 },
+    // shadowOpacity: 0.6,
+    // shadowRadius: 2,
+    // elevation: 4,
+  },
+  activeTab: {
+    backgroundColor: Colors.light.blueColor,
+    borderRadius: 50,
+    // shadowColor: "#000",
+    // shadowOffset: { width: 0, height: 1 },
+    // shadowOpacity: 0.8,
+    // shadowRadius: 2,
+    // elevation: 6,
+  },
+  activeTabText: {
+    color: Colors.light.background,
+    fontWeight: "bold",
+  },
+  tabText: {
+    fontSize: 12,
+    // paddingVertical: 10,
   },
 });

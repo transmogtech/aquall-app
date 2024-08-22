@@ -1,15 +1,30 @@
-import { StyleSheet, Text, View, FlatList, Image } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  Image,
+  Pressable,
+} from "react-native";
 import React from "react";
 import { FontAwesome } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
+import { API_URL } from "@/providers/AuthProvider";
+import { Link } from "expo-router";
+import HeadingText from "./HeadingText";
+import { CapitalizeFirstLetter } from "@/functions";
 
 const BestSellingProductList = ({ products, title }) => {
   return (
     <View>
-      <View style={styles.container}>
-        <Text style={styles.title}>{title}</Text>
-        <FontAwesome name="angle-right" size={20} />
-      </View>
+      <Link href={`/products`} key={Math.random()} asChild>
+        <Pressable>
+          <View style={styles.container}>
+            <HeadingText text={title} />
+            <FontAwesome name="angle-right" size={20} />
+          </View>
+        </Pressable>
+      </Link>
       <FlatList
         data={products}
         renderItem={({ item, index }) => (
@@ -21,14 +36,30 @@ const BestSellingProductList = ({ products, title }) => {
             }}
             key={index}
           >
-            <Image source={item.image} resizeMode="contain" />
-            <Text style={styles.productTitle}>{item.title}</Text>
-            <View style={styles.container2}>
-              <Text style={styles.text}>Shop Now</Text>
-              <Text style={styles.text}>
-                <FontAwesome name="rupee" size={12} /> {item.price}
-              </Text>
-            </View>
+            <Link href={`/products/${item._id}`} key={Math.random()} asChild>
+              <Pressable>
+                <Image
+                  source={{ uri: `${API_URL}/${item.imageUrl}` }}
+                  resizeMode="contain"
+                  style={{
+                    width: 170,
+                    height: 140,
+                    borderRadius: 20,
+                    backgroundColor: Colors.light.background,
+                    alignContent: "center",
+                  }}
+                />
+                <Text style={styles.productTitle}>
+                  {CapitalizeFirstLetter(item.name)}
+                </Text>
+                <View style={styles.container2}>
+                  <Text style={styles.text}>Shop Now</Text>
+                  <Text style={styles.text}>
+                    <FontAwesome name="rupee" size={12} /> {item.price}
+                  </Text>
+                </View>
+              </Pressable>
+            </Link>
           </View>
         )}
         numColumns={2}
@@ -49,16 +80,17 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     width: "100%",
-    padding: 20,
+    padding: 10,
+    fontFamily: "Quicksand_400Regular",
   },
   container2: {
-    flex: 1,
+    // flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
     width: "100%",
-    paddingVertical: 2,
     paddingHorizontal: 20,
+    fontFamily: "Quicksand_400Regular",
   },
   title: {
     fontSize: 20,
@@ -68,9 +100,11 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     textAlign: "center",
     padding: 8,
+    fontFamily: "Quicksand_600SemiBold",
+    fontSize: 16,
   },
   text: {
-    fontWeight: "bold",
     color: Colors.light.blueColor,
+    fontFamily: "Quicksand_600SemiBold",
   },
 });

@@ -7,17 +7,17 @@ export async function getUserRoles() {
 
     return response.data.userroles;
   } catch (error) {
-    console.log(error);
+    // console.log(error);
   }
 }
 
 export async function signup(formData: {}) {
   try {
     const response = await axios.post(`${API_URL}/user/signup`, formData);
-    // console.log(response);
+    // // console.log(response);
     return response;
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return error;
   }
 }
@@ -30,7 +30,7 @@ export async function otp_verification(otp: number, userId: string) {
     });
     return response.data;
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     return error;
   }
 }

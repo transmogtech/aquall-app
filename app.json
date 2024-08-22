@@ -2,7 +2,7 @@
   "expo": {
     "name": "AquallApp",
     "slug": "AquallApp",
-    "version": "1.0.0",
+    "version": "3.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -14,14 +14,16 @@
     },
     "ios": {
       "supportsTablet": true,
-      "config": {}
+      "config": {},
+      "bundleIdentifier": "AquallApp"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.sangitatech.AquallApp"
+      "package": "com.sangitatech.AquallApp",
+      "version": "3.0.0"
     },
     "web": {
       "bundler": "metro",
@@ -40,7 +42,10 @@
       "expo-router",
       "expo-video",
       "expo-document-picker",
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-font",
+      "@config-plugins/react-native-pdf",
+      "@config-plugins/react-native-blob-util"
     ],
     "experiments": {
       "typedRoutes": true

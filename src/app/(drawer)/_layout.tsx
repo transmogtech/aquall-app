@@ -20,30 +20,32 @@ import { router, usePathname } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { API_URL, useAuth } from "@/providers/AuthProvider";
 import axios from "axios";
-
+import ProtectRoute from "@/components/ProtectedRoute";
+import { useDispatch, useSelector } from "react-redux";
+import { logoutAction } from "../(redux)/authSlice";
 const CustomDrawerContent = (props: any) => {
   const pathname = usePathname();
-  const [user, setUser] = useState();
   const screenHeight = Dimensions.get("window").height;
-
-  const { authState, onLogout } = useAuth();
-  // console.log(authState);
-
+  const dispatch = useDispatch();
+  const [user, setUser] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
-    if (!authState?.authenticated) {
-      router.push("/");
-    }
     const loadUser = async () => {
       try {
         const result = await axios.get(`${API_URL}/user/auth`);
         setUser(result.data);
+        setIsLoading(false);
       } catch (err) {
-        console.log(err);
+        // console.log(err);
       }
     };
 
     loadUser();
   }, [pathname]);
+
+  const handleLogout = async () => {
+    dispatch(logoutAction());
+  };
   return (
     <DrawerContentScrollView {...props} style={{ flex: 1 }}>
       <ImageBackground
@@ -53,35 +55,39 @@ const CustomDrawerContent = (props: any) => {
           backgroundColor: Colors.light.blueColor,
           height: screenHeight,
         }}
-        imageStyle={{ opacity: 0.2 }}
-        resizeMode="stretch"
+        imageStyle={{ opacity: 0.1 }}
+        resizeMode="cover"
       >
-        <View style={{ padding: 20 }}>
-          <Image
-            source={{
-              uri: user?.img
-                ? user.img
-                : "https://www.gravatar.com/avatar/f6d8b3f3ddca53201e716d8992cf15fd?s=200&r=pg&d=mm",
-            }}
-            style={{
-              width: 100,
-              height: 100,
-              alignSelf: "center",
-              borderRadius: 50,
-            }}
-          />
-          <Text
-            style={{
-              alignSelf: "center",
-              fontWeight: "500",
-              fontSize: 18,
-              paddingTop: 10,
-              color: Colors.light.background,
-            }}
-          >
-            {user?.name}
-          </Text>
-        </View>
+        {!isLoading && user && (
+          <View style={{ padding: 20 }}>
+            <Image
+              source={{
+                uri: user?.avatar
+                  ? `${API_URL}/${user.avatar}`
+                  : "https://www.gravatar.com/avatar/f6d8b3f3ddca53201e716d8992cf15fd?s=200&r=pg&d=mm",
+              }}
+              style={{
+                width: 100,
+                height: 100,
+                alignSelf: "center",
+                borderRadius: 50,
+              }}
+            />
+            <Text
+              style={{
+                alignSelf: "center",
+                fontWeight: "500",
+                fontSize: 18,
+                paddingTop: 10,
+                color: Colors.light.background,
+                fontFamily: "Quicksand_600SemiBold",
+              }}
+            >
+              {user?.name}
+            </Text>
+          </View>
+        )}
+
         <DrawerItem
           icon={() => (
             <Ionicons size={18} color={Colors.light.background} name="home" />
@@ -136,13 +142,16 @@ const CustomDrawerContent = (props: any) => {
           labelStyle={styles.navItemLable}
           style={{
             backgroundColor:
-              pathname == "/ponds" ? Colors.light.blueColor : "transparent",
+              pathname == "/brood-stock"
+                ? Colors.light.blueColor
+                : "transparent",
           }}
           onPress={() => {
-            router.push("/(drawer)/(tabs)/ponds");
+            router.push("/(drawer)/brood-stock");
           }}
         />
-        <DrawerItem
+
+        {/* <DrawerItem
           icon={() => (
             <Ionicons
               size={18}
@@ -159,7 +168,7 @@ const CustomDrawerContent = (props: any) => {
           onPress={() => {
             router.push("/(drawer)/about-us");
           }}
-        />
+        /> */}
         <DrawerItem
           icon={() => (
             <FontAwesome
@@ -208,7 +217,7 @@ const CustomDrawerContent = (props: any) => {
           )}
           label="Logout"
           labelStyle={styles.navItemLable}
-          onPress={onLogout}
+          onPress={handleLogout}
         />
       </ImageBackground>
     </DrawerContentScrollView>
@@ -217,29 +226,31 @@ const CustomDrawerContent = (props: any) => {
 
 const DrawerLayout = () => {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <Drawer
-        screenOptions={{
-          headerShown: false,
-          drawerStyle: { backgroundColor: Colors.light.blueColor },
-          drawerLabelStyle: {
-            fontSize: 16,
-            color: Colors.light.background,
-          },
-          headerTintColor: Colors.light.background,
-          headerStyle: {
-            backgroundColor: Colors.light.blueColor,
-          },
-          headerTitleStyle: {
-            fontSize: 16,
-            color: Colors.light.background,
-          },
+    <ProtectRoute>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <Drawer
+          screenOptions={{
+            headerShown: false,
+            drawerStyle: { backgroundColor: Colors.light.blueColor },
+            drawerLabelStyle: {
+              fontSize: 16,
+              color: Colors.light.background,
+            },
+            headerTintColor: Colors.light.background,
+            headerStyle: {
+              backgroundColor: Colors.light.blueColor,
+            },
+            headerTitleStyle: {
+              fontSize: 16,
+              color: Colors.light.background,
+            },
 
-          headerTitleAlign: "center",
-        }}
-        drawerContent={(props) => <CustomDrawerContent {...props} />}
-      />
-    </GestureHandlerRootView>
+            headerTitleAlign: "center",
+          }}
+          drawerContent={(props) => <CustomDrawerContent {...props} />}
+        />
+      </GestureHandlerRootView>
+    </ProtectRoute>
   );
 };
 
@@ -250,5 +261,6 @@ const styles = StyleSheet.create({
     marginLeft: -20,
     fontSize: 18,
     color: Colors.light.background,
+    fontFamily: "Quicksand_600SemiBold",
   },
 });

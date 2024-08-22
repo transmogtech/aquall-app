@@ -20,7 +20,7 @@ import { API_URL } from "@/providers/AuthProvider";
 import axios from "axios";
 
 const OtpVerification = () => {
-  const { userId } = useLocalSearchParams();
+  const { userId, mobile, request_type } = useLocalSearchParams();
   const [errors, setErrors] = useState("");
   const [loading, setLoading] = useState(false);
   const [otp, setOtp] = useState("");
@@ -42,10 +42,15 @@ const OtpVerification = () => {
       const response = await axios.post(`${API_URL}/user/otp-verification`, {
         otp,
         userId,
+        request_type,
       });
       if (response.data.message) {
         setLoading(false);
-        router.push("/");
+        if (request_type == "signup") {
+          router.push("/");
+        } else {
+          router.push(`/reset-password?userId=${userId}`);
+        }
       }
     } catch (error) {
       setErrors("Something went wrong, please try again");
@@ -67,8 +72,7 @@ const OtpVerification = () => {
               className="text-center mx-auto"
             />
             <Text className="text-center text-gray-500 mt-6">
-              Please input the code we just sent to your phone number, +234 90
-              1234 5678
+              Please input the code we just sent to your phone number, {mobile}
             </Text>
             <View className="p-4 w-full">
               <OtpTextInput
@@ -99,7 +103,7 @@ export default OtpVerification;
 
 const styles = StyleSheet.create({
   button: { backgroundColor: Colors.light.blueColor },
-  container: { fontFamily: "Quicksand" },
+  container: { fontFamily: "Quicksand_400Regular" },
   optInput: {
     backgroundColor: "#f0f0f0",
     borderWidth: 0,

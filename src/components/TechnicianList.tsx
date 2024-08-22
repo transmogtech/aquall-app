@@ -3,11 +3,12 @@ import React from "react";
 import { Link } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
 import Colors from "@/constants/Colors";
+import { defaultUserImage } from "@assets/data/home";
 
 const TechnicianListItem = ({ item }: any) => {
   return (
     <View style={styles.article}>
-      <Image source={item.image} style={styles.userImage} />
+      <Image source={{ uri: defaultUserImage }} style={styles.userImage} />
 
       <View style={{ flex: 1 }}>
         <Text style={styles.userName} numberOfLines={2}>

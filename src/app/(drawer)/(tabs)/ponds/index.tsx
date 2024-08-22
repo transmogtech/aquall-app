@@ -12,7 +12,7 @@ import PondListItem from "@/components/PondListItem";
 
 const PondListingLayout = () => {
   return (
-    <View className="flex-1 justify-center items-center w-full p-0 m-0 font-[Satoshi]">
+    <View className="flex-1 justify-center items-center w-full p-0 m-0">
       <Stack.Screen options={{ headerTitle: "Ponds List" }} />
       <SafeAreaView className="flex-1  w-full">
         <ScrollView className="flex-1 w-full">

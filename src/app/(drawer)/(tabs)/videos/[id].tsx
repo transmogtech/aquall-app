@@ -6,12 +6,13 @@ import {
   View,
   SafeAreaView,
 } from "react-native";
-import { useRef, useState, useCallback, useEffect } from "react";
+import React, { useRef, useState, useCallback, useEffect } from "react";
 import Colors from "@constants/Colors";
 import { Stack, useLocalSearchParams } from "expo-router";
 import YoutubePlayer from "react-native-youtube-iframe";
 import { API_URL } from "@/providers/AuthProvider";
 import axios from "axios";
+import moment from "moment";
 // import videos from "@assets/data/video";
 
 const VideoItem = () => {
@@ -27,7 +28,7 @@ const VideoItem = () => {
         setVideo(response.data);
         setVideoId(response.data.url.split("https://youtu.be/")[1]);
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       }
     };
     fetchData();
@@ -63,8 +64,11 @@ const VideoItem = () => {
           resizeMode="cover"
           className="flex-1 w-full"
         >
-          <Text style={styles.title}> {video.title}</Text>
-          <Text style={styles.date}> {video.created}</Text>
+          <Text style={styles.title}>{video.title}</Text>
+          <Text style={styles.date}>
+            {" "}
+            {moment(video.created).format("DD-MM-YYYY")}
+          </Text>
           <YoutubePlayer
             play={playing}
             height={400}
@@ -84,14 +88,15 @@ const styles = StyleSheet.create({
     margin: 15,
   },
   title: {
-    fontWeight: "bold",
+    fontFamily: "Quicksand_700Bold",
     fontSize: 20,
-    marginBottom: 10,
-    color: Colors.light.text,
-    paddingHorizontal: 20,
+    color: Colors.light.blueColor,
+    padding: 20,
   },
   date: {
+    fontFamily: "Quicksand_500Medium",
     fontSize: 14,
+    color: "#5A5A5A",
     paddingHorizontal: 20,
     marginBottom: 20,
   },

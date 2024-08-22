@@ -14,7 +14,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 type SegmentedControlProps = {
-  options: string[];
+  options: [];
   selectedOption: string;
   onOptionChange?: (option: string) => void;
 };
@@ -54,16 +54,16 @@ const SegmentedControl = ({
         return (
           <TouchableOpacity
             onPress={() => {
-              onOptionChange?.(option);
+              onOptionChange?.(option._id);
             }}
-            key={option}
+            key={option._id}
             style={{
               width: itemWidth,
               justifyContent: "center",
               alignItems: "center",
             }}
           >
-            <Text>{option}</Text>
+            <Text>{option.title}</Text>
           </TouchableOpacity>
         );
       })}

@@ -11,9 +11,8 @@ import React, { useState } from "react";
 import { API_URL } from "@/providers/AuthProvider";
 
 const ImageSlider = ({ images }) => {
-  console.log(images);
   const { width } = Dimensions.get("window");
-  const height = width * 0.7;
+  const height = width * 0.5;
 
   const [active, setActive] = useState(0);
 
@@ -27,13 +26,23 @@ const ImageSlider = ({ images }) => {
     }
   };
   return (
-    <View>
+    <View
+      style={{
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+        margin: 10,
+      }}
+    >
       <ScrollView
         pagingEnabled
         horizontal
         onScroll={change}
         showsHorizontalScrollIndicator={false}
-        style={{ width, height }}
+        style={{
+          width: width,
+          height,
+        }}
       >
         {images.map((image, index: number) => (
           <Image

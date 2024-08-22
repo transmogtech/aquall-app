@@ -1,10 +1,11 @@
 import { StyleSheet, Image, Pressable } from "react-native";
-
+import React from "react";
 import { Text, View } from "./Themed";
 import Colors from "@constants/Colors";
 import { Job } from "@/types";
 import { Link } from "expo-router";
-import AntDesign from "@expo/vector-icons/AntDesign";
+import { CapitalizeFirstLetter } from "@/functions";
+import AppStyles from "@/constants/AppStyles";
 
 type JobListItemProps = {
   job: Job;
@@ -14,33 +15,34 @@ const JobListItem = ({ job }: JobListItemProps) => {
   return (
     <Link href={`/jobs/${job._id}`} asChild>
       <Pressable style={styles.container}>
-        <View>
-          <Text style={styles.title}> {job.title}</Text>
+        <View style={{ paddingBottom: 20 }}>
+          <Text style={AppStyles.HeaderStyle}>
+            {" "}
+            {CapitalizeFirstLetter(job.title)}
+          </Text>
         </View>
 
         <View style={styles.infoContainer}>
-          <Text style={styles.info}>Position: </Text>
+          <Text style={AppStyles.TextStyle}>Position: </Text>
           <Text style={styles.info} className="text-gray-400">
             {job.position}
           </Text>
         </View>
         <View style={styles.infoContainer}>
-          <Text style={styles.info}>Category: </Text>
+          <Text style={AppStyles.TextStyle}>Category: </Text>
           <Text style={styles.info} className="text-gray-400">
             {job.category}
           </Text>
         </View>
         <View style={styles.infoContainer}>
-          <Text style={styles.info}>Type: </Text>
+          <Text style={AppStyles.TextStyle}>Type: </Text>
           <Text style={styles.info} className="text-gray-400">
             {job.type}
           </Text>
         </View>
         <View style={styles.infoContainer}>
-          <Text style={styles.info}>Location: </Text>
-          <Text style={styles.info} className="text-gray-400">
-            {job.location}
-          </Text>
+          <Text style={AppStyles.TextStyle}>Location: </Text>
+          <Text style={styles.info}>{job.location}</Text>
         </View>
       </Pressable>
     </Link>
@@ -70,9 +72,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     paddingHorizontal: 10,
+    paddingVertical: 5,
     flex: 1,
   },
   info: {
+    fontFamily: "Quicksand_500Medium",
     fontSize: 16,
+    color: "#5A5A5A",
   },
 });

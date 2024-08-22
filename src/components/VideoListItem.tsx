@@ -6,7 +6,7 @@ import { video } from "@/types";
 import { Link } from "expo-router";
 import AntDesign from "@expo/vector-icons/AntDesign";
 // import YoutubePlayer from "react-native-youtube-iframe";
-
+import moment from "moment";
 type VideoListItemProps = {
   video: video;
 };
@@ -25,7 +25,7 @@ const VideoListItem = ({ video }: VideoListItemProps) => {
   // get video id
   const videoId = video.url.split("https://youtu.be/")[1];
   const videoImg = "https://img.youtube.com/vi/" + videoId + "/0.jpg";
-  // console.log(videoImg);
+  // // console.log(videoImg);
   // const onStateChange = useCallback((state: any) => {
   //   if (state === "ended") {
   //     setPlaying(false);
@@ -54,8 +54,10 @@ const VideoListItem = ({ video }: VideoListItemProps) => {
             resizeMode="cover"
           />
 
-          <Text style={styles.title}> {video.title}</Text>
-          <Text style={styles.date}> {video.created}</Text>
+          <Text style={styles.title}>{video.title}</Text>
+          <Text style={styles.date}>
+            {moment(video.created).format("DD-MM-YYYY")}
+          </Text>
         </View>
       </Pressable>
     </Link>
@@ -65,22 +67,24 @@ export default VideoListItem;
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 15,
-    backgroundColor: Colors.light.background,
+    backgroundColor: "white",
+    padding: 10,
+    marginHorizontal: 10,
+    elevation: 2,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.8,
-    shadowRadius: 2,
-    elevation: 5,
+    borderRadius: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   title: {
-    fontWeight: "bold",
-    fontSize: 20,
-    marginBottom: 10,
+    fontFamily: "Quicksand_600SemiBold",
+    fontSize: 16,
     color: Colors.light.text,
-    paddingHorizontal: 20,
+    padding: 10,
   },
   date: {
+    fontFamily: "Quicksand_500Medium",
     fontSize: 14,
     paddingHorizontal: 10,
     marginBottom: 10,

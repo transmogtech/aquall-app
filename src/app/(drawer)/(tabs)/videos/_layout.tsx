@@ -4,9 +4,12 @@ import { Stack, Link } from "expo-router";
 
 import Colors from "@/constants/Colors";
 import MenuButton from "@/components/MenuButton";
-import { Pressable } from "react-native";
-import { FontAwesome } from "@expo/vector-icons";
+import { Pressable, Text, Image, View } from "react-native";
+import { useCart } from "@/providers/CartProvider";
+
 const VideoStack = () => {
+  const { items } = useCart();
+
   return (
     <Stack
       screenOptions={{
@@ -20,12 +23,26 @@ const VideoStack = () => {
           <Link href="/cart" asChild>
             <Pressable>
               {({ pressed }) => (
-                <FontAwesome
-                  name="shopping-cart"
-                  size={25}
-                  color={Colors.light.background}
-                  style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                />
+                <View>
+                  <Image
+                    source={require("@assets/images/cart.png")}
+                    style={{ width: 24, height: 24, marginRight: 10 }}
+                  />
+
+                  <Text
+                    style={{
+                      color: "white",
+                      position: "absolute",
+                      top: -5,
+                      right: 22,
+                      zIndex: 999,
+                      fontSize: 12,
+                      fontFamily: "Quicksand_500Medium",
+                    }}
+                  >
+                    {items.length > 0 && items.length}
+                  </Text>
+                </View>
               )}
             </Pressable>
           </Link>

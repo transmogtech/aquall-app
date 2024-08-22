@@ -4,7 +4,7 @@ import EditScreenInfo from "@components/EditScreenInfo";
 import { Text, View } from "@components/Themed";
 // import videos from "@assets/data/video";
 import VideoListItem from "@/components/VideoListItem";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { API_URL } from "@/providers/AuthProvider";
 // import videos from "@assets/data/video";
 import axios from "axios";
@@ -17,7 +17,7 @@ export default function TabTwoScreen() {
 
         setVideos(response.data.youtubevideos);
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       }
     };
     fetchData();

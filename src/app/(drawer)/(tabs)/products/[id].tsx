@@ -1,6 +1,6 @@
 import { View, Text, Image, StyleSheet, ScrollView } from "react-native";
 import React, { useEffect } from "react";
-import { useLocalSearchParams, Stack, useRouter } from "expo-router";
+import { useLocalSearchParams, Stack, useRouter, Link } from "expo-router";
 import Colors from "@constants/Colors";
 import { useState } from "react";
 import Button from "@/components/Button";
@@ -11,6 +11,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { CartItem } from "@/types";
 import { API_URL } from "@/providers/AuthProvider";
 import axios from "axios";
+import { CapitalizeFirstLetter } from "@/functions";
 
 export const defaultImage =
   "https://notjustdev-dummy.s3.us-east-2.amazonaws.com/food/default.png";
@@ -36,7 +37,7 @@ const productDetails = () => {
 
         setProduct(response.data);
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       }
     };
     fetchData();
@@ -56,11 +57,11 @@ const productDetails = () => {
   };
   return (
     <View style={styles.container}>
-      <Stack.Screen options={{ title: product.name }} />
+      <Stack.Screen options={{ title: CapitalizeFirstLetter(product.name) }} />
       <ScrollView>
         <Image
           source={{ uri: `${API_URL}/${product.imageUrl}` || defaultImage }}
-          resizeMode="cover"
+          resizeMode="contain"
           style={styles.image}
         />
         <View style={styles.infoContainer}>
@@ -102,8 +103,11 @@ const productDetails = () => {
               />
             </Text>
             <View style={styles.ratingWrapper}>
-              <FontAwesome name="rupee" size={18} />
-              <Text>40</Text>
+              <Text
+                style={{ fontFamily: "Quicksand_600SemiBold", fontSize: 16 }}
+              >
+                ₹ 40
+              </Text>
             </View>
           </View>
         </View>
@@ -122,13 +126,7 @@ const productDetails = () => {
               name="minus"
               size={20}
               color="gray"
-              style={{
-                borderColor: "black",
-                borderWidth: 1,
-                borderRadius: 5,
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              style={{ padding: 5 }}
             />
 
             <Text style={styles.quantity}>{quantity}</Text>
@@ -136,30 +134,26 @@ const productDetails = () => {
               onPress={() => updateQuantity(1)}
               name="plus"
               size={20}
-              color={Colors.light.background}
-              style={{
-                borderColor: "black",
-                borderWidth: 1,
-                borderRadius: 5,
-                alignItems: "center",
-                justifyContent: "center",
-                color: Colors.light.background,
-                backgroundColor: Colors.light.blueColor,
-              }}
+              color="gray"
+              style={{ padding: 5 }}
             />
           </View>
         </View>
         <View style={styles.descriptionWrapper}>
           <Text style={styles.title}>Description</Text>
-          <Text style={styles.description}>- Clean Products</Text>
-          <Text style={styles.description}>- 100% Original quality</Text>
-          <Text style={styles.description}>
-            - Bought items cannot be refunded
-          </Text>
-          <Text style={styles.description}>- Available in bulk</Text>
+
+          <Text style={styles.description}>{product.description}</Text>
         </View>
+
+        <Button text="Add to cart" onPress={addToCart} />
+        <Link
+          className="bg-gray-300 hover:bg-gray-400  py-2 px-4 rounded text-center"
+          style={{ fontFamily: "Quicksand_600SemiBold" }}
+          href={`/products/request?productId=${product._id}`}
+        >
+          Quote Request
+        </Link>
       </ScrollView>
-      <Button text="Add to cart" onPress={addToCart} />
     </View>
   );
 };
@@ -172,6 +166,13 @@ const styles = StyleSheet.create({
     alignItems: "flex-start", // if you want to fill rows left to right
     padding: 20,
     marginVertical: 10,
+    marginBottom: 10,
+    marginLeft: 10,
+    marginRight: 10,
+    elevation: 2,
+    shadowColor: "#000",
+    borderRadius: 10,
+    justifyContent: "space-between",
   },
   item: {
     width: "50%", // is 50% of container width
@@ -184,13 +185,26 @@ const styles = StyleSheet.create({
     alignItems: "flex-start", // if you want to fill rows left to right
     padding: 20,
     marginVertical: 10,
+    marginBottom: 10,
+    marginLeft: 10,
+    marginRight: 10,
+    elevation: 2,
+    shadowColor: "#000",
+    borderRadius: 10,
+    justifyContent: "space-between",
   },
   descriptionWrapper: {
     flex: 1,
     flexDirection: "column",
-    backgroundColor: Colors.light.background,
-    padding: 20,
-    marginVertical: 10,
+    backgroundColor: "white",
+    padding: 10,
+    marginBottom: 10,
+    marginHorizontal: 10,
+    elevation: 2,
+    shadowColor: "#000",
+    borderRadius: 10,
+    justifyContent: "space-between",
+    alignItems: "flex-start",
   },
   container: {
     padding: 10,
@@ -199,9 +213,9 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   title: {
+    fontFamily: "Quicksand_600SemiBold",
     fontSize: 20,
     color: Colors.light.blueColor,
-    fontWeight: "bold",
     marginVertical: 10,
   },
   separator: {
@@ -212,17 +226,19 @@ const styles = StyleSheet.create({
   price: {
     color: Colors.light.blueColor,
     fontSize: 24,
-    fontWeight: "bold",
+    fontFamily: "Quicksand_600SemiBold",
   },
   rating: {
     textAlign: "right",
   },
   category: {
     fontSize: 16,
+    fontFamily: "Quicksand_500Medium",
   },
   image: {
     width: "100%",
     aspectRatio: 1,
+    backgroundColor: Colors.light.background,
   },
   cartWrapper: { textAlign: "right", alignItems: "flex-end" },
   cart: {
@@ -256,7 +272,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     fontSize: 18,
   },
-  description: {},
+  description: { fontFamily: "Quicksand_500Medium", fontSize: 16 },
 });
 
 export default productDetails;

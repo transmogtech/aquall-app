@@ -3,7 +3,7 @@ module.exports = {
   content: ["./App.{js,jsx,ts,tsx}", "./src/app/**/*.{js,jsx,ts,tsx}"],
   theme: {
     fontFamily: {
-      body: ["Satoshi"]
+      body: ["Quicksand_400Regular"]
     },
     extend: {
       colors: {

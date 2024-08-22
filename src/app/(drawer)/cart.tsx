@@ -12,7 +12,7 @@ const CartScreen = () => {
   const router = useRouter();
 
   const checkout = () => {
-    console.log("checkout");
+    // console.log("checkout");
     router.push("/checkout");
   };
   const { items, total } = useCart();
@@ -23,6 +23,10 @@ const CartScreen = () => {
           title: "Cart",
           headerShown: true,
           headerTitleAlign: "center",
+          headerLargeTitleStyle: {
+            fontFamily: "Quicksand_600SemiBold",
+            fontSize: 16,
+          },
         }}
       />
       <FlatList
@@ -32,21 +36,28 @@ const CartScreen = () => {
       />
       <View
         style={{
-          backgroundColor: Colors.light.background,
+          backgroundColor: "white",
           padding: 10,
+          marginBottom: 10,
+          marginLeft: 10,
+          marginRight: 10,
+          elevation: 2,
+          shadowColor: "#000",
           borderRadius: 10,
-          marginVertical: 10,
-          height: 60,
-          justifyContent: "space-between",
           flexDirection: "row",
+          justifyContent: "space-between",
           alignItems: "center",
-          gap: 10,
-          paddingHorizontal: 10,
         }}
       >
-        <Text style={{ fontWeight: "bold", fontSize: 20 }}>Total</Text>
+        <Text style={{ fontFamily: "Quicksand_700Bold", fontSize: 20 }}>
+          Total
+        </Text>
         <Text
-          style={{ fontWeight: "bold", fontSize: 20, alignSelf: "flex-end" }}
+          style={{
+            fontFamily: "Quicksand_700Bold",
+            fontSize: 20,
+            alignSelf: "flex-end",
+          }}
         >
           <FontAwesome name="rupee" size={18} />
           {total}

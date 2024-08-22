@@ -7,41 +7,69 @@ import {
   Text,
 } from "react-native";
 import ProductListItem from "@components/ProductListItem";
-import { useEffect, useState } from "react";
+import React, { useMemo, useState } from "react";
 import Colors from "@/constants/Colors";
 import axios from "axios";
 import { API_URL } from "@/providers/AuthProvider";
-import { router, useLocalSearchParams } from "expo-router";
-import { getCagegories, getProducts } from "@assets/data/home";
+import { useLocalSearchParams } from "expo-router";
+import { getCagegories } from "@assets/data/home";
+import { ScrollView } from "react-native-gesture-handler";
+import { ActivityIndicator } from "react-native-paper";
+import CategoryListItem from "@/components/CategoryListItem";
 export default function TabOneScreen() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [isLoading, setLoading] = useState(false);
 
   const { category } = useLocalSearchParams();
   const [activeTab, setActiveTab] = useState(category || "");
+  // console.log("Category called: " + category);
 
   const fetchData = async (category) => {
+    setLoading(true);
+
     try {
-      const response = await axios.get(
-        `${API_URL}/products?categoryId=${category}`
-      );
+      var url = "";
+
+      if (category) {
+        url = `${API_URL}/products?categoryId=${category}`;
+      } else {
+        url = `${API_URL}/products`;
+      }
+      // // console.log(url);
+      const response = await axios.get(url);
 
       setProducts(response.data.products);
+      setLoading(false);
     } catch (error) {
-      console.log(error);
+      // console.log(error.data);
     }
   };
-  useEffect(() => {
+  useMemo(() => {
     const fetchCategories = async () => {
       const result = await getCagegories();
 
-      setCategories(result);
+      const catArr = [{ id: "", title: "All" }];
+
+      result.forEach((category) => {
+        catArr.push({
+          id: category._id,
+          title: category.title,
+        });
+      });
+
+      setCategories(catArr);
+
+      // setCategories(result);
     };
 
     fetchCategories();
 
+    // console.log("Active Category:  " + activeTab);
+    setActiveTab(category);
+
     fetchData(category);
-  }, []);
+  }, [category]); // eslint-disable-line
 
   const filterProducts = (category: any) => {
     setActiveTab(category);
@@ -51,83 +79,93 @@ export default function TabOneScreen() {
 
   return (
     <SafeAreaView>
-      <View style={styles.tabsContainer}>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === "" && styles.activeTab]}
-          onPress={() => filterProducts("")}
+      <ScrollView
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
+        style={styles.tabsContainer}
+      >
+        {/* <View
+          style={[
+            styles.tab,
+            (activeTab === "" || activeTab == undefined) && styles.activeTab,
+          ]}
         >
-          <Text
-            style={[styles.tabText, activeTab === "" && styles.activeTabText]}
-          >
-            All
-          </Text>
-        </TouchableOpacity>
-        {categories &&
-          categories.map((category) => {
+          <TouchableOpacity onPress={() => filterProducts("")}>
+            <Text
+              style={[
+                styles.tabText,
+                (activeTab === "" || activeTab == undefined) &&
+                  styles.activeTabText,
+              ]}
+            >
+              All
+            </Text>
+          </TouchableOpacity>
+        </View> */}
+        <FlatList
+          data={categories}
+          renderItem={({ item }) => (
+            <CategoryListItem
+              category={item}
+              activeTab={activeTab}
+              filterProducts={filterProducts}
+            />
+          )}
+          horizontal={true}
+          contentContainerStyle={{ gap: 20 }}
+          keyExtractor={(item, index) => {
+            return index.toString();
+          }}
+        />
+        {/* {categories &&
+          categories.map((row, index) => {
             return (
               <TouchableOpacity
-                style={[
-                  styles.tab,
-                  activeTab === category._id && styles.activeTab,
-                ]}
-                onPress={() => filterProducts(category._id)}
+                style={[styles.tab, activeTab === row._id && styles.activeTab]}
+                onPress={() => filterProducts(row._id)}
+                key={index}
               >
                 <Text
                   style={[
                     styles.tabText,
-                    activeTab === category._id && styles.activeTabText,
+                    activeTab === row._id && styles.activeTabText,
                   ]}
                 >
-                  {category.title}
+                  {row.title}
                 </Text>
               </TouchableOpacity>
             );
-          })}
-      </View>
+          })} */}
+      </ScrollView>
 
-      <FlatList
-        data={products}
-        renderItem={({ item }) => <ProductListItem product={item} />}
-        numColumns={2}
-        contentContainerStyle={{ gap: 20 }}
-        columnWrapperStyle={{ gap: 20 }}
-        style={{ padding: 20 }}
-      />
+      {isLoading ? (
+        <View style={styles.center}>
+          <ActivityIndicator />
+        </View>
+      ) : (
+        <FlatList
+          data={products}
+          renderItem={({ item }) => <ProductListItem product={item} />}
+          numColumns={2}
+          contentContainerStyle={{ gap: 20 }}
+          columnWrapperStyle={{ gap: 20 }}
+          keyExtractor={(item, index) => {
+            return index.toString();
+          }}
+          style={{ padding: 20 }}
+        />
+      )}
     </SafeAreaView>
   );
 }
 const styles = StyleSheet.create({
   tabsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    margin: 10,
-    backgroundColor: "transparent",
+    padding: 8,
   },
-  tab: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: Colors.light.background,
-    borderRadius: 50,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.8,
-    shadowRadius: 2,
-    elevation: 6,
-  },
-  activeTab: {
-    backgroundColor: Colors.light.blueColor,
-    borderRadius: 50,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.8,
-    shadowRadius: 2,
-    elevation: 6,
-  },
-  activeTabText: {
-    color: Colors.light.background,
-    fontWeight: "bold",
-  },
-  tabText: {
-    fontSize: 12,
+
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

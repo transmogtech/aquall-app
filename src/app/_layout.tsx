@@ -1,7 +1,7 @@
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {
+  createNavigationContainerRef,
   DefaultTheme,
-  NavigationContainer,
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
@@ -12,10 +12,15 @@ import "react-native-reanimated";
 
 import CartProvider from "@/providers/CartProvider";
 import { AuthProvider, useAuth } from "@/providers/AuthProvider";
-import Colors from "@/constants/Colors";
-import { Pressable } from "react-native";
-import MenuButton from "@/components/MenuButton";
-
+import {
+  Quicksand_400Regular,
+  Quicksand_700Bold,
+  Quicksand_500Medium,
+  Quicksand_600SemiBold,
+} from "@expo-google-fonts/quicksand";
+import { Provider } from "react-redux";
+import { store } from "./(redux)/store";
+import LocalRoute from "@/components/LocalRoute";
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: "(tabs)",
@@ -27,7 +32,11 @@ export default function RootLayout() {
   const [loaded, error] = useFonts({
     Satoshi: require("../../assets/fonts/Satoshi-Regular.ttf"),
     SpaceMono: require("../../assets/fonts/SpaceMono-Regular.ttf"),
-    Quicksand: require("@assets/fonts/Quicksand-Regular.ttf"),
+    "Quicksand-Regular": require("@assets/fonts/Quicksand-Regular.ttf"),
+    Quicksand_400Regular,
+    Quicksand_700Bold,
+    Quicksand_600SemiBold,
+    Quicksand_500Medium,
     ...FontAwesome.font,
   });
 
@@ -50,24 +59,26 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const { authState, onLogout } = useAuth();
-
   return (
-    <ThemeProvider value={DefaultTheme}>
-      <AuthProvider>
+    <Provider store={store}>
+      <ThemeProvider value={DefaultTheme}>
         <CartProvider>
-          <Stack>
-            <Stack.Screen name="index" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="(user)/orders"
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
-
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          </Stack>
+          <Layout />
         </CartProvider>
-      </AuthProvider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </Provider>
   );
 }
+
+export const Layout = () => {
+  return (
+    <LocalRoute>
+      <Stack>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Screen name="(user)/orders" options={{ headerShown: false }} />
+      </Stack>
+    </LocalRoute>
+  );
+};

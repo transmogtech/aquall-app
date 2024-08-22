@@ -14,7 +14,14 @@ const TechnicianStack = () => {
     >
       <Stack.Screen
         name="index"
-        options={{ title: "Technician List", headerTitleAlign: "center" }}
+        options={{
+          title: "Technician List",
+          headerTitleAlign: "center",
+          headerTitleStyle: {
+            color: Colors.light.background,
+            fontFamily: "Quicksand_600SemiBold",
+          },
+        }}
       />
     </Stack>
   );

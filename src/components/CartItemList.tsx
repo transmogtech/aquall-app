@@ -7,6 +7,7 @@ import { defaultImage } from "./ProductListItem";
 import { FontAwesome } from "@expo/vector-icons";
 import { useCart } from "@/providers/CartProvider";
 import { API_URL } from "@/providers/AuthProvider";
+import { CapitalizeFirstLetter } from "@/functions";
 
 type CartListItemProps = {
   cartItem: CartItem;
@@ -24,9 +25,13 @@ const CartListItem = ({ cartItem }: CartListItemProps) => {
         resizeMode="contain"
       />
       <View style={{ flex: 1 }}>
-        <Text style={styles.title}>{cartItem.product.name}</Text>
+        <Text style={styles.title}>
+          {CapitalizeFirstLetter(cartItem.product.name)}
+        </Text>
         <View style={styles.subtitleContainer}>
-          <Text style={styles.price}>${cartItem.product.price.toFixed(2)}</Text>
+          <Text style={styles.price}>
+            ₹ {cartItem.product.price.toFixed(2)}
+          </Text>
         </View>
       </View>
       <View style={styles.quantitySelector}>
@@ -57,6 +62,12 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
+    marginBottom: 10,
+    marginLeft: 10,
+    marginRight: 10,
+    elevation: 2,
+    shadowColor: "#000",
+    justifyContent: "space-between",
   },
   image: {
     width: 75,
@@ -65,8 +76,9 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   title: {
-    fontWeight: "500",
-    fontSize: 16,
+    fontFamily: "Quicksand_700Bold",
+    color: Colors.light.blueColor,
+    fontSize: 18,
     marginBottom: 5,
   },
   subtitleContainer: {
@@ -75,17 +87,17 @@ const styles = StyleSheet.create({
   },
   quantitySelector: {
     flexDirection: "row",
-    gap: 10,
+    gap: 5,
     alignItems: "center",
     marginVertical: 10,
   },
   quantity: {
-    fontWeight: "500",
-    fontSize: 18,
+    fontFamily: "Quicksand_500Medium",
+    fontSize: 16,
   },
   price: {
-    color: Colors.light.tint,
-    fontWeight: "bold",
+    fontFamily: "Quicksand_500Medium",
+    fontSize: 16,
   },
 });
 

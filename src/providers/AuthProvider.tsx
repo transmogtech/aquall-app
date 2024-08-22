@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 
@@ -9,13 +9,9 @@ interface AuthProps {
   onLogout?: () => Promise<any>;
 }
 
-const JWT_KEY = "SECRET_ACCESS_KEY";
+const JWT_KEY = "NEWAQUALLAPP";
 
-export const API_URL = "http://52.64.124.217:3030";
-
-const headers = {
-  "Content-Type": "application/json",
-};
+export const API_URL = "http://162.241.149.132:3030";
 
 const AuthContext = createContext<AuthProps>({});
 
@@ -32,7 +28,7 @@ export const AuthProvider = ({ children }: any) => {
   useEffect(() => {
     const loadToken = async () => {
       const token = await SecureStore.getItemAsync(JWT_KEY);
-      console.log(token);
+      // // console.log(token);
       if (token) {
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
         setAuthState({ token, authenticated: true });
@@ -53,8 +49,8 @@ export const AuthProvider = ({ children }: any) => {
   };
 
   const login = async (email: string, password: string) => {
-    // console.log("email: " + email + " password: " + password);
-    // console.log(`${API_URL}/auth/login`);
+    // // console.log("email: " + email + " password: " + password);
+    // // console.log(`${API_URL}/auth/login`);
     try {
       const result = await axios.post(`${API_URL}/user/login`, {
         email,
@@ -62,18 +58,15 @@ export const AuthProvider = ({ children }: any) => {
         isMobileLogin: true,
       });
 
-      console.log(result.data);
+      // console.log(result.data);
       setAuthState({
         token: result?.data.token,
         authenticated: true,
       });
 
-      axios.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${result.data.token}`;
-
       await SecureStore.setItemAsync(JWT_KEY, result.data.token);
-
+      axios.defaults.headers.common["Authorization"] =
+        `Bearer ${result.data.token}`;
       return result;
     } catch (error) {
       return { error: true, msg: (error as any).response.data.errors.message };

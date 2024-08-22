@@ -1,13 +1,16 @@
 import { API_URL } from "@/providers/AuthProvider";
 import axios from "axios";
 
+// axios.defaults.headers.common["Authorization/"] = "Bearer " + authState.token;
+
 export async function getCagegories() {
   try {
-    const response = await axios.get(`${API_URL}/categories`);
+    const response = await axios.get(`${API_URL}/categories?status=active`);
 
     return response.data.categories;
   } catch (error) {
-    console.log(error);
+    // // console.log("category error: ");
+    // // console.log(error.response.data);
   }
 }
 
@@ -17,11 +20,11 @@ export async function getAppSliderImages() {
 
     return response.data.appsliderimages;
   } catch (error) {
-    console.log(error);
+    // // console.log(error);
   }
 }
 
-export async function getProducts(category = "", limit = 3) {
+export async function getProducts(category = "", limit = 5) {
   try {
     const response = await axios.get(
       `${API_URL}/products?categoryId=${category}&limit=${limit}`
@@ -29,7 +32,7 @@ export async function getProducts(category = "", limit = 3) {
 
     return response.data.products;
   } catch (error) {
-    console.log(error);
+    // console.log(error.response.status);
   }
 }
 
@@ -39,7 +42,7 @@ export async function getLatestVideos() {
 
     return response.data.youtubevideos;
   } catch (error) {
-    console.log(error);
+    // console.log(error);
   }
 }
 
@@ -51,7 +54,7 @@ export async function getUsers(userRole = "") {
 
     return response.data.users;
   } catch (error) {
-    console.log(error);
+    // console.log(error);
   }
 }
 
@@ -63,18 +66,18 @@ export async function getTechnicians() {
 
     return response.data.users;
   } catch (error) {
-    console.log(error);
+    // console.log(error);
   }
 }
 
 export async function getSponsoredAds(limit = 3) {
   try {
     const response = await axios.get(`${API_URL}/sponsored-ads`);
-    console.log("sponsored Ad: ");
-    console.log(response.data);
+    // // console.log("sponsored Ad: ");
+    // // console.log(response.data);
     return response.data.sponsoredads;
   } catch (error) {
-    console.log(error);
+    // console.log(error);
   }
 }
 

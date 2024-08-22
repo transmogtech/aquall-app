@@ -8,7 +8,7 @@ const ApplicationConfirmationLayout = () => {
   const router = useRouter();
 
   const goHome = () => {
-    router.push("/jobs");
+    router.push("/home");
   };
   return (
     <View

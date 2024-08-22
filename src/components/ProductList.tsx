@@ -1,40 +1,104 @@
-import { StyleSheet, Text, View, FlatList, Image } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Pressable,
+  FlatList,
+  Image,
+} from "react-native";
 import React from "react";
 import { FontAwesome } from "@expo/vector-icons";
 import { API_URL } from "@/providers/AuthProvider";
-
-const ProductList = ({ products, title }) => {
+import { Link } from "expo-router";
+import { CapitalizeFirstLetter } from "@/functions";
+import CapitalizedText from "./CapitalizedText";
+import HeadingText from "./HeadingText";
+const ProductList = ({ products, title, id }) => {
   return (
-    <View>
-      <View style={styles.container}>
-        <Text style={styles.title}>{title}</Text>
-        <FontAwesome name="angle-right" size={20} />
-      </View>
+    <View style={{ padding: 10 }}>
+      <Link href={`/products?category=${id}`} key={Math.random()} asChild>
+        <Pressable>
+          <View style={styles.container}>
+            <HeadingText text={title} />
+            <FontAwesome name="angle-right" size={20} />
+          </View>
+        </Pressable>
+      </Link>
 
       <FlatList
         data={products}
+        keyExtractor={(item, index) => {
+          return index.toString();
+        }}
         renderItem={({ item, index }) => (
-          <View
+          <Link
             style={{
               flex: 1,
               justifyContent: "center",
               alignItems: "center",
             }}
-            key={index}
+            href={`/products/${item._id}`}
+            asChild
           >
-            <Image
-              source={{ uri: `${API_URL}/${item.imageUrl}` }}
-              resizeMode="contain"
-              style={{ width: 70, height: 70 }}
-            />
-            <Text style={styles.productTitle}>{item.name}</Text>
-            <Text style={styles.category}>{item.culturetypeId?.title}</Text>
-          </View>
+            <Pressable key={item._id}>
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+                key={index}
+              >
+                <View
+                  style={{
+                    width: 70,
+                    height: 70,
+                    borderRadius: 50,
+                    shadowColor: "#000",
+                    backgroundColor: "#fff",
+                    shadowOffset: { width: 1, height: 1 },
+                    shadowOpacity: 0.8,
+                    shadowRadius: 1,
+                    elevation: 5,
+                  }}
+                >
+                  <Image
+                    source={{ uri: `${API_URL}/${item.imageUrl}` }}
+                    resizeMode="contain"
+                    style={{
+                      borderRadius: 50,
+
+                      width: "100%",
+                      height: "100%",
+                    }}
+                  />
+                </View>
+                <CapitalizedText
+                  style={{
+                    paddingVertical: 10,
+                    fontFamily: "Quicksand_600SemiBold",
+                    fontSize: 16,
+                    color: "#000000",
+                  }}
+                  text={item.name}
+                />
+                <Text
+                  style={{
+                    color: "#5A5A5A",
+                    fontFamily: "Quicksand_500Medium",
+                    fontSize: 14,
+                  }}
+                >
+                  {item.culturetypeId?.title}
+                </Text>
+              </View>
+            </Pressable>
+          </Link>
         )}
-        numColumns={3}
         contentContainerStyle={{ gap: 20 }}
-        columnWrapperStyle={{ gap: 20 }}
-        scrollEnabled={false}
+        scrollEnabled={true}
+        horizontal
+        showsHorizontalScrollIndicator={false}
       />
     </View>
   );
@@ -49,7 +113,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     width: "100%",
-    padding: 20,
+    paddingVertical: 20,
   },
   title: {
     fontSize: 20,
@@ -58,7 +122,6 @@ const styles = StyleSheet.create({
   productTitle: {
     fontWeight: "600",
     textAlign: "center",
-    padding: 8,
   },
   category: {
     color: "#5A5A5A",
